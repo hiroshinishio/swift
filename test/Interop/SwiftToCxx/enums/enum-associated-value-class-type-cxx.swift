@@ -56,7 +56,7 @@ public enum G<T> {
 // CHECK-NEXT: }
 
 // CHECK: SWIFT_INLINE_THUNK bool E::matchesIntValue(swift::Int value) const {
-// CHECK-NEXT: return _impl::$s5Enums1EO15matchesIntValueySbSiF(value, _impl::swift_interop_passDirect_Enums_uint64_t_0_8_uint8_t_8_9(_getOpaquePointer()));
+// CHECK-NEXT: return Enums::_impl::$s5Enums1EO15matchesIntValueySbSiF(value, Enums::_impl::swift_interop_passDirect_Enums_uint64_t_0_8_uint8_t_8_9(_getOpaquePointer()));
 
 // CHECK: SWIFT_INLINE_THUNK swift::Array<C> F::getB() const {
 // CHECK-NEXT:    if (!isB()) abort();

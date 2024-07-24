@@ -46,6 +46,7 @@
 #include "clang/AST/DeclObjC.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/SourceManager.h"
+#include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace swift;
@@ -234,14 +235,28 @@ private:
     os << ">";
   }
 
+  void printUsingForNestedType(const NominalTypeDecl *TD,
+                               const ModuleDecl *moduleContext) {
+    if (TD->isImplicit() || TD->isSynthesized())
+      return;
+    os << "  using ";
+    ClangSyntaxPrinter(os).printBaseName(TD);
+    os << "=";
+    ClangSyntaxPrinter(os).printNominalTypeReference(TD, moduleContext);
+    os << ";\n";
+  }
+
   /// Prints the members of a class, extension, or protocol.
   template <bool AllowDelayed = false, typename R>
   void printMembers(R &&members) {
     CxxEmissionScopeRAII cxxScopeRAII(owningPrinter);
-    // FIXME: Actually track emitted members in nested
-    // lexical scopes.
-    // FIXME: Emit unavailable C++ decls for not emitted
-    // nested members.
+    // Using statements for nested types.
+    for (const Decl *member : members) {
+      if (member->getModuleContext()->isStdlibModule())
+        break;
+      if (const auto *TD = dyn_cast<NominalTypeDecl>(member))
+        printUsingForNestedType(TD, TD->getModuleContext());
+    }
     bool protocolMembersOptional = false;
     for (const Decl *member : members) {
       auto VD = dyn_cast<ValueDecl>(member);
@@ -2795,7 +2810,8 @@ static bool isAsyncAlternativeOfOtherDecl(const ValueDecl *VD) {
   return false;
 }
 
-static bool isStringNestedType(const ValueDecl *VD, StringRef Typename) {
+namespace swift {
+bool isStringNestedType(const ValueDecl *VD, StringRef Typename) {
   auto ctx = VD->getDeclContext();
   return VD->hasName() && VD->getName().isSimpleName() &&
          VD->getBaseIdentifier().str() == Typename &&
@@ -2803,6 +2819,7 @@ static bool isStringNestedType(const ValueDecl *VD, StringRef Typename) {
          cast<ExtensionDecl>(ctx->getAsDecl())->getExtendedNominal() ==
              VD->getASTContext().getStringDecl();
 }
+} // namespace swift
 
 static bool hasExposeAttr(const ValueDecl *VD) {
   if (isa<NominalTypeDecl>(VD) && VD->getModuleContext()->isStdlibModule()) {
