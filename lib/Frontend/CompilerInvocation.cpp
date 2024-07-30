@@ -627,6 +627,17 @@ void LangOptions::setCxxInteropFromArgs(ArgList &Args,
       cxxInteropCompatVersion =
           validateCxxInteropCompatibilityMode("swift-5.9").second;
   }
+
+  for (const Arg *A : Args.filtered(options::OPT_Xcc)) {
+    StringRef clangArg = A->getValue();
+    if (clangArg.consume_front("-stdlib")) {
+      clangArg.consume_front("=");
+      if (clangArg.equals("libc++"))
+        CXXStdlib = CXXStdlibKind::OverrideLibcxx;
+      else
+        Diags.diagnose(SourceLoc(), diag::unsupported_cxx_stdlib);
+    }
+  }
 }
 
 static std::optional<swift::StrictConcurrency>

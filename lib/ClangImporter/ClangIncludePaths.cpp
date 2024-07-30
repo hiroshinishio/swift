@@ -256,6 +256,10 @@ static void getLibStdCxxFileMapping(
   if (triple.isAndroid()
       || (triple.isMusl() && triple.getVendor() == llvm::Triple::Swift))
     return;
+  // Make sure we are building with libstdc++. On platforms where libstdc++ is
+  // the default C++ stdlib, users can still compile with `-Xcc -stdlib=libc++`.
+  if (ctx.LangOpts.CXXStdlib == CXXStdlibKind::OverrideLibcxx)
+    return;
 
   // Extract the libstdc++ installation path from Clang driver.
   auto clangDriver = createClangDriver(ctx, vfs);

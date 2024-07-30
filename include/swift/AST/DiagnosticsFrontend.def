@@ -561,6 +561,10 @@ WARNING(enable_interop_flag_deprecated,none,
         "the '-enable-experimental-cxx-interop' flag is deprecated; please pass "
         "'-cxx-interoperability-mode=' instead", ())
 
+ERROR(unsupported_cxx_stdlib,none,
+      "unsupported C++ standard library requested; please pass 'libc++' or omit"
+      "`-Xcc -stdlib=` to use the system default C++ standard library", ())
+
 ERROR(layout_string_instantiation_without_layout_strings,none,
       "-enable-layout-string-value-witnesses-instantiation can not be enabled "
       "without -enable-layout-string-value-witnesses.", ())

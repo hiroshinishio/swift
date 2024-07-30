@@ -19,6 +19,7 @@
 #define SWIFT_BASIC_LANGOPTIONS_H
 
 #include "swift/AST/DiagnosticsFrontend.h"
+#include "swift/Basic/CXXStdlibKind.h"
 #include "swift/Basic/Feature.h"
 #include "swift/Basic/FixedBitSet.h"
 #include "swift/Basic/FunctionBodySkipping.h"
@@ -320,6 +321,8 @@ namespace swift {
 
     void setCxxInteropFromArgs(llvm::opt::ArgList &Args,
                                swift::DiagnosticEngine &Diags);
+
+    CXXStdlibKind CXXStdlib = CXXStdlibKind::PlatformDefault;
 
     bool CForeignReferenceTypes = false;
 
