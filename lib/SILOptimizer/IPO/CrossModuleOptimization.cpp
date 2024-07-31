@@ -347,6 +347,7 @@ void CrossModuleOptimization::serializeVTablesInModule() {
 
   for (const auto &vt : M.getVTables()) {
     if (vt->getSerializedKind() != getRightSerializedKind(M) &&
+        !vt->getClass()->isObjC() &&
         vt->getClass()->getEffectiveAccess() >= AccessLevel::Package) {
        bool containsInternal =
           llvm::any_of(vt->getEntries(), [&](const SILVTableEntry &entry) {
@@ -625,7 +626,18 @@ bool CrossModuleOptimization::canUseFromInline(DeclContext *declCtxt) {
   /// conservative here.
   if (conservative && M.getOptions().emitTBD && couldBeLinkedStatically(declCtxt, M))
     return false;
-    
+
+  if (auto *decl = declCtxt->getAsDecl()) {
+    if (auto *VD = dyn_cast<ValueDecl>(decl)) {
+      // Don't allow serializing objc type in Package CMO
+      // as it can cause a crash.
+      if (VD->isObjC() &&
+          isPackageCMOEnabled(M.getSwiftModule())) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
