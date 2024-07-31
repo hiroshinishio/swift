@@ -1056,9 +1056,11 @@ LoadedFile *SerializedModuleLoaderBase::loadAST(
     Ctx.Diags.diagnose(loc, diag::enable_cxx_interop_docs);
   }
   // Modules built with libc++ cannot be imported into modules that are built
-  // with libstdc++, and vice versa.
+  // with libstdc++, and vice versa. Make an exception for Cxx.swiftmodule since
+  // it doesn't refer to any C++ stdlib symbols.
   if (M.hasCxxInteroperability() && Ctx.LangOpts.EnableCXXInterop &&
-      M.getCXXStdlibKind() != Ctx.LangOpts.CXXStdlib) {
+      M.getCXXStdlibKind() != Ctx.LangOpts.CXXStdlib &&
+      M.getName().str() != CXX_MODULE_NAME) {
     auto loc = diagLoc.value_or(SourceLoc());
     Ctx.Diags.diagnose(loc, diag::cxx_stdlib_kind_mismatch, M.getName(),
                        M.getCXXStdlibKind(), Ctx.LangOpts.CXXStdlib);
