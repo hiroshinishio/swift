@@ -1055,6 +1055,14 @@ LoadedFile *SerializedModuleLoaderBase::loadAST(
                        M.getName());
     Ctx.Diags.diagnose(loc, diag::enable_cxx_interop_docs);
   }
+  // Modules built with libc++ cannot be imported into modules that are built
+  // with libstdc++, and vice versa.
+  if (M.hasCxxInteroperability() && Ctx.LangOpts.EnableCXXInterop &&
+      M.getCXXStdlibKind() != Ctx.LangOpts.CXXStdlib) {
+    auto loc = diagLoc.value_or(SourceLoc());
+    Ctx.Diags.diagnose(loc, diag::cxx_stdlib_kind_mismatch, M.getName(),
+                       M.getCXXStdlibKind(), Ctx.LangOpts.CXXStdlib);
+  }
 
   return fileUnit;
 }
