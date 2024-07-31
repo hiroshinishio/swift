@@ -853,6 +853,7 @@ void Serializer::writeBlockInfoBlock() {
   BLOCK_RECORD(options_block, MODULE_ABI_NAME);
   BLOCK_RECORD(options_block, IS_CONCURRENCY_CHECKED);
   BLOCK_RECORD(options_block, HAS_CXX_INTEROPERABILITY_ENABLED);
+  BLOCK_RECORD(options_block, CXX_STDLIB_KIND);
   BLOCK_RECORD(options_block, MODULE_PACKAGE_NAME);
   BLOCK_RECORD(options_block, MODULE_EXPORT_AS_NAME);
   BLOCK_RECORD(options_block, PLUGIN_SEARCH_OPTION);
@@ -1134,6 +1135,10 @@ void Serializer::writeHeader() {
         options_block::HasCxxInteroperabilityEnabledLayout
             CxxInteroperabilityEnabled(Out);
         CxxInteroperabilityEnabled.emit(ScratchRecord);
+      }
+      if (M->getCXXStdlibKind() != CXXStdlibKind::PlatformDefault) {
+        options_block::CXXStdlibKindLayout CXXStdlibKind(Out);
+        CXXStdlibKind.emit(ScratchRecord);
       }
 
       if (Options.SerializeOptionsForDebugging) {

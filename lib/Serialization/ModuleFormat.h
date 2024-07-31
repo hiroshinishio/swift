@@ -949,6 +949,7 @@ namespace options_block {
     HAS_CXX_INTEROPERABILITY_ENABLED,
     ALLOW_NON_RESILIENT_ACCESS,
     SERIALIZE_PACKAGE_ENABLED,
+    CXX_STDLIB_KIND,
   };
 
   using SDKPathLayout = BCRecordLayout<
@@ -1030,6 +1031,10 @@ namespace options_block {
 
   using HasCxxInteroperabilityEnabledLayout = BCRecordLayout<
     HAS_CXX_INTEROPERABILITY_ENABLED
+  >;
+
+  using CXXStdlibKindLayout = BCRecordLayout<
+    CXX_STDLIB_KIND
   >;
 
   using AllowNonResilientAccess = BCRecordLayout<
